@@ -1,44 +1,32 @@
-#docker run -d -p 3306:3306 --name mysql -e MYSQL_ROOT_PASSWORD=EGx2zDsoqg -v ~/Workspace/PHP/db:/var/lib/mysql mysql:5.7
-#docker run -d -p 9000:9000 --name php-fpm -v ~/Workspace/PHP:/var/www/html --link=mysql php:5.6-fpm
-#docker run -d -p 80:80 --name webserver -v ~/Workspace/PHP:/usr/share/nginx/html -v ~/Workspace/PHP/conf.d:/etc/nginx/conf.d -v ~/Workspace/PHP/log:/var/log/nginx --link=php-fpm:php --link=mysql:mysql nginx:1.12
+version: '3'
+services:
+  nginx:
+    build:
+      context: ./docker/nginx
+      args:
+        - phpfpm_host=phpfpm
+    volumes:
+      - src:/usr/share/nginx/html
+      - socket:/var/run
+    ports:
+      - 1308:80
+    networks:
+      - default
+    depends_on:
+      - phpfpm
+    restart: always
+  phpfpm:
+    build:
+      context: ./docker/php-fpm
+    volumes:
+      - src:/var/www/html
+      - socket:/var/run
+    networks:
+      - default
+    restart: always
+networks:
+  default:
 
-version: 2
-  services:
-    mysql:
-      image: mysql:5.7
-      ports:
-        - 3306:3306
-      volumes:
-        - ~/Workspace/PHP/db:/var/lib/mysql
-      environment:
-        MYSQL_ROOT_PASSWORD: rootpass
-        MYSQL_DATABASE: db
-        MYSQL_USER: user
-        MYSQL_PASSWORD: pass
-      working_dir: /workpace
-      restart: always
-    #导入数据
-
-    php:
-      build: php-fpm
-      ports:
-        - 9000:9000
-      volumes:
-        - ~/Workspace/PHP:/var/www/html
-      links:
-        - mysql
-      restart: always
-
-    nginx:
-      image: nginx:1.12
-      ports:
-        - 80:80
-      volumes:
-        - ~/Workspace/PHP:/usr/share/nginx/html
-        - ~/Workspace/PHP/conf.d:/etc/nginx/conf.d
-        - ~/Workspace/PHP/log:/var/log/nginx
-      links:
-        - mysql
-        - php
-      restart: always
-    #配置
+volumes:
+  src:
+  socket:
