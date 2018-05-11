@@ -14,4 +14,5 @@ FROM php:5.6-fpm
 #	    docker-php-ext-install gd
 
 RUN touch /var/run/php-fpm.sock
+
 COPY zz-docker.conf /usr/local/etc/php-fpm.d/
