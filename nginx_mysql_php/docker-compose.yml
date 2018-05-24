@@ -13,7 +13,6 @@ services:
     tty: true
     restart: always
   mysql:
-#    image: mysql:${MYSQL_VERSION}
     build: ./Docker/mysql
     ports:
       - ${MYSQL_PORT}:3306
@@ -42,7 +41,7 @@ services:
     build:
       context: ./Docker/nginx
     volumes:
-      - src:/usr/share/nginx/html
+      - src:/usr/share/nginx/html/application
       - socket:/var/run
     ports:
       - ${WEB_PORT}:80
